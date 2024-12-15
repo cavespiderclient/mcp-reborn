@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url = 'https://maven.fabricmc.net/' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'net.fabricmc:fabric-loom:0.10-SNAPSHOT'
+    }
+}
+
+apply plugin: 'fabric-loom'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.fabricmc.net/' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.16.5"
+    mappings "net.fabricmc:yarn:1.16.5+build.5:v2"
+    modImplementation "net.fabricmc:fabric-language-kotlin:1.6.1+kotlin.1.5.21"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+minecraft {
+    accessWidener = file('src/main/resources/my_mod.accesswidener')
+}
+
+tasks.register('runClient', JavaExec) {
+    group = "fabric"
+    description = "Runs the Fabric Minecraft client"
+    classpath sourceSets.main.runtimeClasspath
+    main = 'net.fabricmc.loader.launch.knot.KnotClient'
+    args '--gameDir', file('run')
+}
+
+tasks.register('runServer', JavaExec) {
+    group = "fabric"
+    description = "Runs the Fabric Minecraft server"
+    classpath sourceSets.main.runtimeClasspath
+    main = 'net.fabricmc.loader.launch.knot.KnotServer'
+    args '--gameDir', file('run')
+}
+
+tasks.register('setup') {
+    group = "fabric"
+    description = "Setups the dev workspace"
+    dependsOn 'loom'
+}
+
+tasks.register('build') {
+    group = "fabric"
+    description = "Builds the Fabric Minecraft mod"
+    dependsOn 'jar'
+}
